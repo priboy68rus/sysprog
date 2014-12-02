@@ -1,0 +1,19 @@
+Server:
+
+create service fifo
+
+in loop:
+	read from service fifo
+	parse
+	create fifo
+	open file
+	write to fifo
+
+
+Client:
+
+open service fifo
+write to it
+open fifo
+read from it
+write to 1
