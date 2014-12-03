@@ -138,10 +138,10 @@ int main(int argc, char *argv[], char *envp[])
 	char pathname_sem[] = "clt.c";
 
 	vbuf.sem_op = 1;
-	vbuf.sem_flg = 0;
+	vbuf.sem_flg = SEM_UNDO;
 
 	pbuf.sem_op = -1;
-	pbuf.sem_flg = 0;
+	pbuf.sem_flg = SEM_UNDO;
 
 	if((key = ftok(pathname_sem,0)) < 0){
 		printf("Can\'t generate key\n");
@@ -174,7 +174,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	// Send
 
-	sleep(1);
+	// sleep(1);
 
 	vbuf.sem_num = MTX;
 	if (semop(semid, &vbuf, 1) < 0)
