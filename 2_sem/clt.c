@@ -135,12 +135,18 @@ int main(int argc, char *argv[], char *envp[])
 	
 	int semid;
 	struct sembuf vbuf, pbuf;
+	char pathname_sem[] = "clt.c";
 
 	vbuf.sem_op = 1;
 	vbuf.sem_flg = 0;
 
 	pbuf.sem_op = -1;
 	pbuf.sem_flg = 0;
+
+	if((key = ftok(pathname_sem,0)) < 0){
+		printf("Can\'t generate key\n");
+		exit(-1);
+	}
 
 	if ((semid = semget(key, 3, 0666 | IPC_CREAT)) < 0)
 	{
@@ -150,6 +156,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	// 0 - clt, 1 - srv, 2 - mutex
 
+	printf("Waiting in clt\n");
 	pbuf.sem_num = CLT;
 	if (semop(semid, &pbuf, 1) < 0)
 	{
@@ -157,6 +164,7 @@ int main(int argc, char *argv[], char *envp[])
 		exit(-1);
 	}
 
+	printf("Waiting in mutex\n");
 	pbuf.sem_num = MTX;
 	if (semop(semid, &pbuf, 1) < 0)
 	{
@@ -165,6 +173,8 @@ int main(int argc, char *argv[], char *envp[])
 	}	
 
 	// Send
+
+	sleep(1);
 
 	vbuf.sem_num = MTX;
 	if (semop(semid, &vbuf, 1) < 0)

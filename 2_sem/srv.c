@@ -25,7 +25,7 @@ int main(int argc, char *argv[], char *envp[])
 	int new = 1;
 	char pathname[] = "srv.c";
 	key_t key;
-	
+
 	int i = 0;
 
 	// Creating and opening shared memory
@@ -39,22 +39,22 @@ int main(int argc, char *argv[], char *envp[])
 
 	if ((shmid = shmget(key, 4096 * sizeof(char), 0666|IPC_CREAT|IPC_EXCL)) < 0)
 	{
-		if (errno!= EEXIST)
+		if (errno != EEXIST)
 		{
 			printf("Cant create shared memory\n");
 			exit(-1);
 		} 
 		else
 		{
-			if ((shmid = shmget(key, 4096 *  sizeof(char), 0)) < 0)
+			if ((shmid = shmget(key, 4096 * sizeof(char), 0)) < 0)
 			{
 				perror(argv[0]);
 				exit(errno);
 			}
 			new = 0;
 		}
-		perror(argv[0]);
-		exit(errno);
+		// perror(argv[0]);
+		// exit(errno);
 	}
 
 	if ((data = (char *)shmat(shmid, NULL, 0)) == (char *)(-1))
@@ -73,6 +73,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	int semid;
 	struct sembuf vbuf, pbuf;
+	char pathname_sem[] = "clt.c";
 
 	vbuf.sem_op = 1;
 	vbuf.sem_flg = 0;
@@ -80,15 +81,21 @@ int main(int argc, char *argv[], char *envp[])
 	pbuf.sem_op = -1;
 	pbuf.sem_flg = 0;
 
+	if((key = ftok(pathname_sem,0)) < 0){
+		printf("Can\'t generate key\n");
+		exit(-1);
+	}
+
 	if ((semid = semget(key, 3, 0666 | IPC_CREAT)) < 0)
 	{
 		printf("Cant get semid\n");
 		exit(errno);
-	}	
+	}
 
 
 	while (1)
 	{
+		printf("Waiting in srv\n");
 		pbuf.sem_num = SRV;
 		if (semop(semid, &pbuf, 1) < 0)
 		{
@@ -96,12 +103,13 @@ int main(int argc, char *argv[], char *envp[])
 			exit(-1);
 		}
 
+		printf("Waiting in mutex\n");
 		pbuf.sem_num = MTX;
 		if (semop(semid, &pbuf, 1) < 0)
 		{
 			printf("Cant wait\n");
 			exit(-1);
-		}	
+		}
 
 		// Read and print
 
@@ -117,7 +125,7 @@ int main(int argc, char *argv[], char *envp[])
 		{
 			printf("Cant wait\n");
 			exit(-1);
-		}	
+		}
 
 	}
 
