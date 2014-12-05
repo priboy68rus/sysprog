@@ -59,12 +59,6 @@ int main(int argc, char *argv[], char *envp[])
 	}
 	
 	// Opening service FIFO
-	
-	if ((fd_srv = open(name_srv, O_RDWR)) < 0)
-	{
-		perror(argv[0]);
-		exit(errno);
-	}
 
 	// Form package
 	
