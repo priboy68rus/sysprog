@@ -98,6 +98,7 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 //	printf("Package sended\n");
+	sleep(1);
 
 	// Read result
 	

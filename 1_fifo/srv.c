@@ -81,7 +81,7 @@ int main(int argc, char *argv[], char *envp[])
 			exit(errno);
 		}
 	*/
-		if ((fd_fifo = open(name_fifo, O_RDWR)) < 0)
+		if ((fd_fifo = open(name_fifo, O_WRONLY)) < 0)
 		{
 			perror(argv[0]);
 			exit(errno);
