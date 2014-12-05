@@ -9,6 +9,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+
+void handler(int nsig)
+{
+	printf("Removing service FIFO...\n");
+	unlink("srv.fifo");
+	printf("Exiting...\n");
+	exit(0);
+}
 
 int main(int argc, char *argv[], char *envp[])
 {
@@ -16,6 +25,8 @@ int main(int argc, char *argv[], char *envp[])
 	int size = 0, fd_srv = -1, fd_file = -1, fd_fifo = -1, id = -1;
 	char * package, * buf;
 	char name_fifo[15];
+
+	signal(SIGINT, handler);
 	
 	// Create service FIFO
 
