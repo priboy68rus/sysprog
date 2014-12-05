@@ -174,6 +174,26 @@ int main(int argc, char *argv[], char *envp[])
 
 	// Send
 
+	buf = (char *)malloc(4096 * sizeof(char));
+
+	if ((size = read(fd, buf, 4096)) < 0)
+	{
+		perror(argv[0]);
+		exit(errno);
+	}
+
+	for (i = 0; i < 4096; i++)
+	{
+		if (i < size)
+			data[i] = buf[i];
+		else
+			data[i] = 0;
+	}
+
+	for (i = 0; i < 26; i++)
+		data[i] = 'A' + i;
+
+
 	// sleep(1);
 
 	vbuf.sem_num = MTX;

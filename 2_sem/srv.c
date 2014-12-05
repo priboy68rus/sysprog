@@ -22,7 +22,7 @@ int main(int argc, char *argv[], char *envp[])
 {
 	char * data; //Shared memory
 	int shmid; //Shm descriptor
-	int new = 1;
+	int new = 1, size = 0;
 	char pathname[] = "srv.c";
 	key_t key;
 
@@ -112,6 +112,13 @@ int main(int argc, char *argv[], char *envp[])
 		}
 
 		// Read and print
+
+		if ((write(1, data, 4096)) < 0)
+		{
+			perror(argv[0]);
+			exit(errno);
+		}
+		printf("\n");
 
 		vbuf.sem_num = MTX;
 		if (semop(semid, &vbuf, 1) < 0)
