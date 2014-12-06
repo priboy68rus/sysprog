@@ -95,7 +95,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	while (1)
 	{
-		printf("Waiting in srv\n");
+		// printf("Waiting in srv\n");
 		pbuf.sem_num = SRV;
 		if (semop(semid, &pbuf, 1) < 0)
 		{
@@ -103,7 +103,7 @@ int main(int argc, char *argv[], char *envp[])
 			exit(-1);
 		}
 
-		printf("Waiting in mutex\n");
+		// printf("Waiting in mutex\n");
 		pbuf.sem_num = MTX;
 		if (semop(semid, &pbuf, 1) < 0)
 		{
@@ -118,7 +118,10 @@ int main(int argc, char *argv[], char *envp[])
 			perror(argv[0]);
 			exit(errno);
 		}
-		printf("\n");
+		// printf("\n");
+
+				sleep(2);
+
 
 		vbuf.sem_num = MTX;
 		if (semop(semid, &vbuf, 1) < 0)
@@ -126,6 +129,7 @@ int main(int argc, char *argv[], char *envp[])
 			printf("Cant wait\n");
 			exit(-1);
 		}
+
 
 		vbuf.sem_num = CLT;
 		if (semop(semid, &vbuf, 1) < 0)

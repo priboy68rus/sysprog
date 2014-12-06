@@ -77,7 +77,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	// Send package
 	
-	if ((fd_srv = open(name_srv, O_RDWR)) < 0)
+	if ((fd_srv = open(name_srv, O_WRONLY)) < 0)
 	{
 		perror(argv[0]);
 		exit(errno);
