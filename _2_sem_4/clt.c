@@ -1,41 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <stddef.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sys/sem.h>
-
-#define SIZE 1024
-
-#define CLT 0
-#define SRV 1
-#define C 2
-#define S 3
-
-#define P(sem)								\
-	pbuf.sem_num = sem;						\
-	if (semop(semid, &pbuf, 1) < 0)			\
-	{										\
-		printf("Cant wait\n");				\
-		exit(-1);							\
-	}										\
-
-#define V(sem)								\
-	vbuf.sem_num = sem;						\
-	if (semop(semid, &vbuf, 1) < 0)			\
-	{										\
-		printf("Cant wait\n");				\
-		exit(-1);							\
-	}										\
+#include "shm.h"
 
 
 int main(int argc, char *argv[], char *envp[])
@@ -99,13 +62,13 @@ int main(int argc, char *argv[], char *envp[])
 		}
 	}
 
-	// Opening file
-	
 	if ((fd = open(argv[1], O_RDONLY, 0666)) < 0)
 	{
 		perror(argv[0]);
 		exit(errno);
 	}
+
+//----------------------------------------------------------------
 
 	int semid;
 	struct sembuf vbuf, pbuf;
@@ -129,7 +92,14 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	printf("CLT: waiting in CLT\n");
+
 	P(CLT)
+	printf("1\n");
+	sleep(1);
+
+	V(SRV)
+	printf("2\n");
+	sleep(1);
 
 	// Send
 	buf = (char *)malloc(SIZE * sizeof(char));
@@ -138,6 +108,9 @@ int main(int argc, char *argv[], char *envp[])
 	{
 		printf("CLT: waiting in C\n");
 		P(C)
+		printf("3\n");
+		sleep(1);
+
 		if ((size = read(fd, buf, SIZE - sizeof(int))) < 0)
 		{
 			perror(argv[0]);
@@ -155,6 +128,8 @@ int main(int argc, char *argv[], char *envp[])
 		printf("CLT: size: %d\n", size);
 
 		V(S)
+		printf("4\n");
+		sleep(1);
 		if (size < SIZE - sizeof(int))
 			break;
 	}

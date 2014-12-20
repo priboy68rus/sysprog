@@ -1,41 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <stddef.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sys/sem.h>
-
-#define SIZE 1024
-
-#define CLT 0
-#define SRV 1
-#define C 2
-#define S 3
-
-#define P(sem)								\
-	pbuf.sem_num = sem;						\
-	if (semop(semid, &pbuf, 1) < 0)			\
-	{										\
-		printf("SRV: P: Cant wait\n");		\
-		exit(-1);							\
-	}										\
-
-#define V(sem)								\
-	vbuf.sem_num = sem;						\
-	if (semop(semid, &vbuf, 1) < 0)			\
-	{										\
-		printf("SRV: V: Cant wait\n");		\
-		exit(-1);							\
-	}										\
+#include "shm.h"
 
 
 int main(int argc, char *argv[], char *envp[])
@@ -90,6 +53,8 @@ int main(int argc, char *argv[], char *envp[])
 		}
 	}
 
+//----------------------------------------------------------------
+
 	int semid;
 	struct sembuf vbuf, pbuf;
 	char pathname_sem[] = "clt.c";
@@ -115,23 +80,30 @@ int main(int argc, char *argv[], char *envp[])
 	while (1)
 	{
 		// printf("SRV: waiting in SRV\n");
+		// printf("1\n");
+		// sleep(1);
 		P(SRV)
 		// printf("SRV: entering loop\n");
 		while(1)
 		{
 			// printf("SRV: waiting in S\n");
+			// printf("2\n");
+			// sleep(1);
 			P(S)
 			// printf("SRV: reading\n");
 
 			size = *(int *)data;
 			// printf("SRV: size: %d\n", size);
 			write(1, data + sizeof(int), size);
+			// printf("3\n");
+			// sleep(1);
 			V(C)
 			
 			if (size < SIZE - sizeof(int))
 				break;
 		}
-
+		// printf("4\n");
+		// sleep(1);
 		V(CLT)
 	}
 
